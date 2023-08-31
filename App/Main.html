@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="master.css" />
+<link rel="stylesheet" href="all.min.css" />
+<link rel="stylesheet" href="leaflet/leaflet.css" />
+<script src="jquery-3.3.1.min.js"></script>
+<script src="angular.min.js"></script>
+<script src="chart-merge.js"></script>
+<script src="chart.min.js"></script>
+<script src="angular-chart.min.js"></script>
+<script src="leaflet/leaflet.js"></script>
+<!--<script src="data.js"></script>-->
+
+<script>
+
+var app = angular.module('APP', ['chart.js']);
+	app.controller( 'dataController',[ '$scope', '$interval', '$http', function($scope, $interval, $http) {
+
+        $scope.companyLabels = [];
+        $scope.companySeries = ['Total'];
+        $scope.companyData = [];
+        $scope.barOptions = {'scales':{'yAxes':[{'ticks': {'beginAtZero':true}}]}};
+        $scope.hbarOptions = {'scales':{'xAxes':[{'ticks': {'beginAtZero':true}}]}};
+        $scope.userCount = 0;
+	$scope.userList = [];
+        $scope.page = 1;
+        $scope.cycle = true;
+
+        // $scope.colors = [
+        //     {
+        //         "borderColor": "black",
+        //         "pointBackgroundColor": "#00dea1",
+        //     },
+        //     {
+        //         "borderColor": "black",
+        //         "pointBackgroundColor": "#00dea1",
+        //     },
+        //     {
+        //         "borderColor": "black",
+        //         "pointBackgroundColor": "#00dea1",
+        //     },
+        //     {
+        //         "borderColor": "black",
+        //         "pointBackgroundColor": "#00dea1",
+        //     },
+        //     {
+        //         "borderColor": "black",
+        //         "pointBackgroundColor": "#00dea1",
+        //     },
+        //     {
+        //         "borderColor": "black",
+        //         "pointBackgroundColor": "#00dea1",
+        //     },
+        //     {
+        //         "borderColor": "black",
+        //         "pointBackgroundColor": "#00dea1",
+        //     },
+        // ];
+
+        $scope.serverLabels = [];
+        $scope.serverSeries = ['Total'];
+        $scope.serverData = [];
+        // $scope.serverColors = [
+        //                 {
+        //                     "borderColor": "black",
+        //                     "pointBackgroundColor": "#00dea1",
+        //                 },
+        //                 {
+        //                     "borderColor": "black",
+        //                     "pointBackgroundColor": "#00dea1",
+        //                 },
+        //                 {
+        //                     "borderColor": "black",
+        //                     "pointBackgroundColor": "#00dea1",
+        //                 },
+        //             ];
+
+        $scope.toggleCycle = function(){
+            $scope.cycle = !$scope.cycle;
+        };
+        $scope.setPage = function(pageNumber){
+            $scope.page = pageNumber;
+        };
+
+
+        $interval(function() {
+            console.log('Interval');
+            $http({
+                method: 'GET',
+                url: 'http://127.0.0.1:5000'
+            }).then(function successCallback(response) {
+                //Got data, put it into the scope vars
+                var result = response.data;
+                var CompanyInfo = result['CompanyInfo'];
+                $scope.companyLabels = CompanyInfo['CompanyLabels'];
+                $scope.companySeries = CompanyInfo['CompanySeries'];
+                $scope.companyData = CompanyInfo['CompanyData'];
+                $scope.userCount = 0;
+		        $scope.userList = result['UserList'];
+                for (x=0;x<$scope.companyData.length;x++){
+                    try {
+                        $scope.userCount = $scope.userCount + $scope.companyData[x];
+                    }
+                    catch (err){
+
+                    };
+                }
+
+                var ServerInfo = result['ServerInfo'];
+                $scope.serverLabels = ServerInfo['ServerLabels'];
+                $scope.serverSeries = ServerInfo['ServerSeries'];
+                $scope.serverData = ServerInfo['ServerData'];
+
+                if ($scope.cycle){
+                    switch ($scope.page){
+                        case 1:
+                            $scope.page = 2;
+                            break;
+                        case 2:
+                            $scope.page = 1;
+                            break;
+                    };
+                };
+                addMarkers(result['UserInfo']);
+
+
+            }, function errorCallback(response) {
+            });
+          }, 15000);
+
+
+	} ]);
+
+
+</script>
+
+<body>
+    <div id="APP" ng-app="APP" ng-controller="dataController" class="my-outlet">
+
+        <!-- Header -->
+        <div class="header">
+            <img src="logo.png" />
+        </div>
+
+
+        <div class="main-container">
+
+            <div class="descp-content">
+                <h3>Users currently connected: {{userCount}}</h3>
+		<h3>Users that have connected today: {{userList.length}}
+            </div>
+
+            <div>
+                <button ng-if="cycle == true" class="button" ng-click="toggleCycle()">Stop carousel</button>
+                <button ng-if="cycle == false" class="button" ng-click="toggleCycle()">Start carousel</button>
+                <button ng-if="cycle == false" class="button" ng-click="setPage(1)">Company Servers</button>
+                <button ng-if="cycle == false" class="button" ng-click="setPage(2)">Map</button>
+            </div>
+
+            <br>
+
+            <div ng-show="page == 1">
+                <div class="bar-content" style="height: 80%;">
+                    <canvas height="80%"
+                        id="users"
+                        class="chart-horizontal-bar"
+                        chart-data="companyData"
+                        chart-labels="companyLabels"
+                        chart-series="companySeries"
+                        chart-colors="colors"
+                        chart-options="hbarOptions">
+                    </canvas>
+                </div>
+                <br>
+                <br>
+                <div class="bar-content" style="height: 20%;">
+                    <canvas height="30%"
+                        id="servers"
+                        class="chart chart-bar"
+                        chart-data="serverData"
+                        chart-labels="serverLabels"
+                        chart-series="serverSeries"
+                        chart-colors="serverColors"
+                        chart-options="barOptions">
+                    </canvas>
+                </div>
+
+            </div>
+
+            <!-- <div id="map" style="height:85%"  ng-if="page == 2"> -->
+            <div ng-show="page == 2" id="map" style="height:85%">
+
+            </div>
+
+        </div>
+
+    </div>
+</body>
+
+<script>
+
+    const mapDiv = document.getElementById("map");
+	//const map = L.map('map').setView([0, 0], 3);
+
+	//const map = L.map('map', {zoomSnap: 0.25}).setView([9.388193, 21.706990], 2.50 , { animation: true });
+    const map = L.map('map', {zoomSnap: 0.25}).setView([17.018827, 21.706990], 2.50 , { animation: true });
+
+    var markerList = [];
+    //var markerLayer = new L.LayerGroup();
+    //markerLayer.addTo(map);
+
+
+	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+
+    const resizeObserver = new ResizeObserver(() => {
+        //map.invalidateSize();
+    });
+
+    resizeObserver.observe(mapDiv);
+
+
+    function addMarkers(inData){
+
+        console.log('Clearing map');
+        // markerLayer.clearLayers();
+        for (x=0;x<markerList.length;x++){
+            var entry = markerList[x];
+            map.removeLayer(entry);
+        };
+
+
+
+        console.log('Adding ' + inData.length + ' entries');
+        for (x=0;x<inData.length;x++){
+            try {
+                var entry = inData[x];
+                var marker = L.marker([entry['Lat'], entry['Lon']]);
+
+                //markerLayer.addLayer(marker);
+                markerList.push(marker);
+                marker.addTo(map);
+             }
+            catch (err){
+
+            };
+        };
+
+
+    };
+
+</script>
+
+
+</html>

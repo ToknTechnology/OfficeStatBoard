@@ -1,0 +1,20 @@
+MiTokn{
+    "App":"AssetCount",
+    "Screen":"AssetCount",
+    "Instr":"Select",
+    "Data":[{
+        "Query":"select * from tblJSONData where objectName = 'JSONAsset' and data like order by key;",
+        "FunctionOnReturn":"init"}
+        ]}
+
+MiTokn{
+    "App":"AGA_WOTIMECONF",
+    "Screen":"AGA_WOTIMECONF",
+    "Instr":"Select",
+    "Data":[
+        {
+        "Query":"select * from tblJSONData where objectName = 'AGA_PM_WC' and data like order by key;",
+        "FunctionOnReturn":"setworkcenters"
+        }
+    ]
+}

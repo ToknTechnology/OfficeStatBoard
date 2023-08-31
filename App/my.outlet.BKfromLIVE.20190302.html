@@ -1,0 +1,677 @@
+
+<!DOCTYPE html>
+<html>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+<link rel="stylesheet" href="app.outlets.css" />
+<link rel="stylesheet" href="master.lotterywest.css" />
+
+<link rel="stylesheet" href="all.min.css" />
+
+<!--<link rel="stylesheet" href="../../src/css/app.outlets.css" />
+<link rel="stylesheet" href="../../src/css/master.lotterywest.css" />-->
+
+
+<script src="jquery-3.3.1.min.js"></script>
+
+<script src="angular.min.js"></script>
+<script src="chart-merge.js"></script>
+<script src="chart.min.js"></script>
+<script src="angular-chart.min.js"></script>
+
+<script src="data.js"></script>
+
+
+<script>
+
+var app = angular.module('APP', ['chart.js']);
+	app.controller( 'dataController',[ '$scope', function($scope) {
+
+        $scope.testData = false;
+        $scope.response = true;
+        $scope.responsemsg = "Triggered:";
+        $scope.errmsg = true;
+        $scope.height_chart = window.innerHeight*0.5;
+        $scope.width_chart = window.innerWidth;
+        $scope.dataResponse = [
+    {
+        "TYPE": "Sales Performance",
+        "SECTION":[
+            {
+                "ID":"001",
+                "NAME":"My Sales Overview",
+                "SOURCE":"TBL",
+                "DATA":{
+                    "head":[
+                        {"THEAD":"Outlet"},
+                        {"THEAD":"Last FY Sales"},
+                        {"THEAD":"YTD Sales LY"},
+                        {"THEAD":"YTD Sales TY"},
+                        {"THEAD":"YTD Difference($)"},
+                        {"THEAD":"YTD Difference(%)"}
+                    ],
+                    "body":[
+                        {
+                            "NAME": "Outlet 1",
+                            "LFY_S": "$1,049,889",
+                            "YTD_LY": "$454,922",
+                            "YTD_TY": "$568,733",
+                            "YTD_DOL": "$113,811",
+                            "YTD_PER": "25%",
+                        }
+                    ]
+                },
+                "DESC":"Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                
+            },
+            {
+                "ID":"002",
+                "NAME":"By Product YTD",
+                "SOURCE":"TBL",
+                "DATA":{
+                    "head":[
+                        {"THEAD":"Product"},
+                        {"THEAD":"Last FY Sales"},
+                        {"THEAD":"YTD Sales LY"},
+                        {"THEAD":"YTD Sales TY"},
+                        {"THEAD":"YTD Difference($)"},
+                        {"THEAD":"YTD Difference(%)"}
+                    ],
+                    "body":[
+                        {
+                            "NAME": "Cash 3",
+                            "LFY_S": "$4,612",
+                            "YTD_LY": "$1,484",
+                            "YTD_TY": "$2,756",
+                            "YTD_DOL": "$1,272",
+                            "YTD_PER": "85.7%",
+                        },
+                        {
+                            "NAME": "Lotto",
+                            "LFY_S": "$4,612",
+                            "YTD_LY": "$1,484",
+                            "YTD_TY": "$2,756",
+                            "YTD_DOL": "$1,272",
+                            "YTD_PER": "85.7%",
+                        },
+                        {
+                            "NAME": "Sratch n Win",
+                            "LFY_S": "$4,612",
+                            "YTD_LY": "$1,484",
+                            "YTD_TY": "$2,756",
+                            "YTD_DOL": "$1,272",
+                            "YTD_PER": "85.7%",
+                        },
+                    ]
+                },
+                "DESC":"Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            },
+            {
+                "ID":"003",
+                "NAME":"By Product Group YTD",
+                "SOURCE":"TBL",
+                "DATA":{
+                    "head":[
+                        {"THEAD":"Product"},
+                        {"THEAD":"Last FY Sales"},
+                        {"THEAD":"YTD Sales LY"},
+                        {"THEAD":"YTD Sales TY"},
+                        {"THEAD":"YTD Difference($)"},
+                        {"THEAD":"YTD Difference(%)"}
+                    ],
+                    "body":[
+                        {
+                            "NAME": "Cash 3",
+                            "LFY_S": "$4,612",
+                            "YTD_LY": "$1,484",
+                            "YTD_TY": "$2,756",
+                            "YTD_DOL": "$1,272",
+                            "YTD_PER": "85.7%",
+                        },
+                        {
+                            "NAME": "Lotto",
+                            "LFY_S": "$4,612",
+                            "YTD_LY": "$1,484",
+                            "YTD_TY": "$2,756",
+                            "YTD_DOL": "$1,272",
+                            "YTD_PER": "85.7%",
+                        },
+                        {
+                            "NAME": "Sratch n Win",
+                            "LFY_S": "$4,612",
+                            "YTD_LY": "$1,484",
+                            "YTD_TY": "$2,756",
+                            "YTD_DOL": "$1,272",
+                            "YTD_PER": "85.7%",
+                        },
+                    ]
+                },
+                "DESC":"Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            },
+            {
+                "ID":"004",
+                "NAME":"Total Sales YTD",
+                "SOURCE":"TBL",
+                "DESC":"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "DATA":{
+                    "head":[
+                        {"THEAD":"Outlet"},
+                        {"THEAD":"Last FY Sales"},
+                        {"THEAD":"YTD Sales LY"},
+                        {"THEAD":"YTD Sales TY"},
+                        {"THEAD":"YTD Difference($)"},
+                        {"THEAD":"YTD Difference(%)"}
+                    ],
+                    "body":[
+                        {
+                            "NAME": "Outlet 1",
+                            "LFY_S": "$1,049,889",
+                            "YTD_LY": "$454,922",
+                            "YTD_TY": "$568,733",
+                            "YTD_DOL": "$113,811",
+                            "YTD_PER": "25%",
+                        }
+                    ]
+                },
+            }
+        ]     
+    },
+    {
+        "TYPE": "Charts",
+        "SECTION":[
+            {
+                "ID":"004",
+                "NAME":"Sales by Month YTD",
+                "SOURCE":"LINE",
+                "DESC":"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "DATA":{
+                    "type":"StackedBar",
+                    "labels":["JUN", "AUG", "SEP", "OCT", "NOV", "DEC", "JAN","FEB","MAR","APR","MAY","JUN"],
+                    "series":["Last FY", "This FY"],
+                    "options":{
+                        "legend": {
+                            "display": true,
+                            "position": "bottom"
+                        },
+                        "elements": {
+                            "line": {
+                                "fill": false,                     
+                                "tension": 0 
+                            },                   
+                        },
+                        "scales": {
+                            "yAxes": [{
+                                "scaleLabel": {
+                                    "display": true,
+                                    "labelString": "thousands (000s)"
+                                }
+                            }]
+                        }
+                    },
+                    "data":[
+                        [1700, 800, 900, 850],
+                        [1000, 800, 700, 750, 760, 800, 500,600,700,1000,1100,900]
+                    ],
+                    "colors" : [
+                        {
+                            "borderColor": "#f7b100",
+                            "pointBackgroundColor": "#f7b100",
+                        },
+                        {
+                          
+                            "borderColor": "#0092ba",
+                            "pointBackgroundColor": "#0092ba",
+                        }
+                    ]                      
+                }
+            },
+            {
+                "ID":"005",
+                "NAME":"Cumulative Sales YTD",
+                "SOURCE":"LINE",
+                "DESC":"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "DATA":{
+                    "type":"StackedBar",
+                    "labels":["JUN", "AUG", "SEP", "OCT", "NOV", "DEC", "JAN","FEB","MAR","APR","MAY","JUN"],
+                    "series":["Last FY", "This FY"],
+                    "options":{
+                        "scales": {
+                            "yAxes": [{
+                                "scaleLabel": {
+                                    "display": true,
+                                    "labelString": "thousands (000s)"
+                                }
+                            }]
+                        },
+                        "legend": {
+                            "display": true,
+                            "position": "bottom"
+                        },
+                        "elements": {
+                            "line": {
+                                "fill": false,                     
+                                "tension": 0 
+                            },                   
+                        }
+                    },
+                    "data":[
+                        [1050, 1150, 1300, 1400],
+                        [1000, 1100, 1200, 1300, 1400, 1500, 1600,1700,1800,1900,2000,2200]
+                    ],
+                    "colors" : [
+                        {
+                            "borderColor": "#f7b100",
+                            "pointBackgroundColor": "#f7b100",
+                        },
+                        {
+                          
+                            "borderColor": "#0092ba",
+                            "pointBackgroundColor": "#0092ba",
+                        }
+                    ]                      
+                }
+            },
+            {
+                "ID":"004",
+                "NAME":"LY Sales by Game YTD",
+                "SOURCE":"BAR",
+                "DESC":"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "DATA":{
+                    "type":"StackedBar",
+                    "labels":["Network","Oulet"], 
+                    "series":["Minor Games", "OZ Lotto", "Powerball", "Red Lotto", "Sratch n Win"],
+                    "options":{
+                        "legend": {
+                            "display": true,
+                            "position": "bottom"
+                        },
+                        "scales": {
+                            "xAxes": [{
+                                "stacked": true, 
+                                "ticks": {
+                                    "beginAtZero": true
+                                }
+                            }],
+                            "yAxes": [{
+                                "scaleLabel": {
+                                    "display": true,
+                                    "labelString": "Percent Scales"
+                                },
+                                "stacked": true,
+                                "ticks": {
+                                    "beginAtZero": true
+                                }
+                            }]
+                        }
+                    },
+                    "data":[
+                        [5.9, 4.6],
+                        [16, 22.8],
+                        [30.4, 46.3],
+                        [34.7, 21.1],
+                        [12.9, 5.3]
+                    ],
+                    "colors" : [
+                        {
+                            "backgroundColor": "#008f6b",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        },
+                        {
+                            "backgroundColor": "#10a300",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        },
+                        {
+                            "backgroundColor": "#002a58",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        },
+                        {
+                            "backgroundColor": "#e40013",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        },
+                        {
+                            "backgroundColor": "#9300af",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        }
+                    ]       
+                }
+            },
+            {
+                "ID":"004",
+                "NAME":"TY Sales by Game YTD",
+                "SOURCE":"BAR",
+                "DESC":"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "DATA":{
+                    "type":"StackedBar",
+                    "labels":["Network","Oulet"], 
+                    "series":["Minor Games", "OZ Lotto", "Powerball", "Red Lotto", "Sratch n Win"],
+                    "options":{
+                        "legend": {
+                            "display": true,
+                            "position": "bottom"
+                        },
+                        "scales": {
+                            "xAxes": [{
+                                "stacked": true, 
+                                "ticks": {
+                                    "beginAtZero": true
+                                }
+                            }],
+                            "yAxes": [{
+                                "scaleLabel": {
+                                    "display": true,
+                                    "labelString": "Percent Scales"
+                                },
+                                "stacked": true,
+                                "ticks": {
+                                    "beginAtZero": true
+                                }
+                            }]
+                        }
+                    },
+                    "data":[
+                        [5.9, 4.6],
+                        [16, 22.8],
+                        [30.4, 46.3],
+                        [34.7, 21.1],
+                        [12.9, 5.3]
+                    ],
+                    "colors" : [
+                        {
+                            "backgroundColor": "#008f6b",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        },
+                        {
+                            "backgroundColor": "#10a300",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        },
+                        {
+                            "backgroundColor": "#002a58",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        },
+                        {
+                            "backgroundColor": "#e40013",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        },
+                        {
+                            "backgroundColor": "#9300af",   
+                            "strokeColor": "rgba(111,111,111,0)",   
+                            "borderWidth": 0, 
+                        }
+                    ]       
+                }
+                
+            }
+        ]     
+    }
+];
+        $scope.selectedResponse = [];
+
+        $scope.setOutlet = function(data){
+
+            if ( $scope.response == true ){
+                alert(JSON.stringify(data[0].SET4));
+            };
+
+            if ( $scope.response == false ){
+                alert(JSON.stringify(data[0].SET4));
+            };
+
+            if ( $scope.testData == true ){
+                $scope.dataResponse = DATA;
+            };
+
+            for( var x = 0; x < $scope.dataResponse.length; x++ ){
+                $scope.dataResponse[x].visible = false;
+            };
+
+
+            $scope.menuToggle();
+           
+        };
+
+        $scope.toggleMenuItem = function(index){
+            if ( $scope.response == false ){
+                alert($scope.responsemsg + "toggleMenuItem");
+            };
+            $scope.dataResponse[index].visible = !$scope.dataResponse[index].visible;
+
+        };
+
+        $scope.selectedItem = function(parent,index,id){
+                        
+            if ( $scope.response == false ){
+                alert($scope.responsemsg + "selectedItem");
+            };
+
+            for( var x = 0; x < $scope.dataResponse.length; x++ ){
+               
+                for( var y = 0; y < $scope.dataResponse[x].SECTION.length; y++ ){
+                    $scope.dataResponse[x].SECTION[y].visible = false;
+                };
+            };
+
+            $scope.selectedResponse = $scope.dataResponse[parent].SECTION[index];
+
+            if($scope.selectedResponse.SOURCE == "TBL"){
+                $scope.tableView(id);
+            };
+
+            if($scope.selectedResponse.SOURCE == "BAR"){
+                $scope.barGraph(id);
+            }; 
+
+            if($scope.selectedResponse.SOURCE == "LINE"){
+                $scope.lineGraph(id);
+            }; 
+
+            $scope.selectedResponse.visible = true;
+            $scope.menuToggle();
+
+            if ( $scope.response == false ){
+                alert(JSON.stringify($scope.selectedResponse));
+            };
+        };
+
+        $scope.menuToggle = function() {
+            $('.off-canvas').toggleClass('open');
+            $('body').toggleClass('expand');
+            $('.hm-btn').toggleClass('open');
+        };
+
+        $scope.tableView = function(){
+            if ( $scope.response == false ){
+                alert($scope.responsemsg + "tableView");
+            };
+
+
+        };
+
+        $scope.barGraph = function(id){
+            if ( $scope.response == false ){
+                alert($scope.responsemsg + "barGraph");
+            };
+            $scope.type = $scope.selectedResponse.DATA.type;
+            $scope.labels = $scope.selectedResponse.DATA.labels;
+            $scope.series = $scope.selectedResponse.DATA.series;
+            $scope.options = $scope.selectedResponse.DATA.options;     
+            $scope.data = $scope.selectedResponse.DATA.data;
+            $scope.colors = $scope.selectedResponse.DATA.colors;
+        };
+        $scope.lineGraph = function(){
+            if ( $scope.response == false ){
+                alert($scope.responsemsg + "lineGraph");
+            };
+
+            $scope.labels = $scope.selectedResponse.DATA.labels;
+            $scope.series = $scope.selectedResponse.DATA.series;
+            $scope.data = $scope.selectedResponse.DATA.data;
+            $scope.options = $scope.selectedResponse.DATA.options;
+            $scope.colors = $scope.selectedResponse.DATA.colors;
+        };
+       
+	} ]);
+
+	function init(data) {
+        alert("init");
+
+        alert("Get Data: " + JSON.stringify(data));
+		try {
+			if (typeof data === 'string' || data instanceof String) {
+				data = JSON.parse(data);
+			};
+		} catch (err) {
+			alert('error');
+		};
+
+		var initscope = angular.element(document.getElementById("APP")).scope();
+		initscope.$apply(function(){
+
+			initscope.setOutlet(data);
+			
+		});
+	};
+
+</script>
+
+<body>
+    <div id="APP" ng-app="APP" ng-controller="dataController" class="my-outlet">
+        
+        <div ng-click="menuToggle()" class="overlay"></div>
+        <!-- Side Menu -->
+        <nav class="off-canvas">
+            <div class="menu-content">
+                <h2>My Timesheets</h2>
+                <ul>
+                    <li ng-repeat="item in dataResponse">
+                        
+                        <a ng-click="toggleMenuItem($index)">{{item.TYPE}} <i ng-class="{expand: item.visible == true}" class="fas fa-chevron-down"></i></a>
+
+                        <div ng-if="item.SECTION.length !== 0">
+                            <ul ng-if="item.visible == true" class="animation">
+                                <li ng-repeat="child in item.SECTION">
+                                    <a ng-click="selectedItem($parent.$index,$index, child.ID )" ng-class="{active: child.visible == true }">{{child.NAME}}</a>
+                                </li>
+                            </ul>
+                            
+                        </div>  
+
+                    </li>
+                </ul>
+            </div>  
+        </nav>
+
+        <!-- Header -->
+        <div class="header">
+            <a class="hm-btn" ng-click="menuToggle()">&#9776;</a>
+            <img src="Lotterywest Logo_Col_Neg.svg" />
+            
+            <div class="user-container">
+                <div class="user-text">
+                        <h6>1234</h6>
+                        <h3>Test User</h3>
+                </div>
+            
+
+                <div class="user-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <h2>{{selectedResponse.NAME}}</h2>
+
+
+            <div ng-if="selectedResponse.SOURCE == 'TBL'" class="table-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr ng-repeat="header in selectedResponse.DATA.head">
+                            <th colspan="5">{{header.THEAD}}</th>
+                        </tr>
+                        
+                    </thead>
+                </table>
+                <div class="srcoll-content">  
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th ng-repeat="item in selectedResponse.DATA.body">{{item.NAME}}</th>
+                            </tr>
+                            <tr>
+                                <td ng-repeat="item in selectedResponse.DATA.body">{{item.LFY_S}}</td>
+                            </tr>
+                            <tr>
+                                <td ng-repeat="item in selectedResponse.DATA.body">{{item.YTD_LY}}</td>
+                            </tr>
+                            <tr>
+                                <td ng-repeat="item in selectedResponse.DATA.body">{{item.YTD_TY}}</td>
+                            </tr>
+                            <tr>
+                                <td ng-repeat="item in selectedResponse.DATA.body">{{item.YTD_DOL}}</td>
+                            </tr>
+                            <tr>
+                                <td ng-repeat="item in selectedResponse.DATA.body">{{item.YTD_PER}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+               
+            </div>
+
+            <div ng-if="selectedResponse.SOURCE == 'BAR'" class="bar-content">
+                <canvas 
+                    id="bar" 
+                    class="chart chart-bar"
+                    width="{{width_chart}}"
+                    height="{{height_chart}}"
+                    chart-data="data" 
+                    chart-type="type"
+                    chart-colors="colors"
+                    chart-options="options"
+                    chart-labels="labels"
+                    chart-series="series">
+                </canvas>
+               
+            </div>
+
+            <div ng-if="selectedResponse.SOURCE == 'LINE'"class="line-content">
+                <canvas 
+                    id="line" 
+                    width="{{width_chart}}"
+                    height="{{height_chart}}"
+                    class="chart chart-line" 
+                    chart-data="data"
+                    chart-type="type"
+                    chart-labels="labels" 
+                    chart-series="series" 
+                    chart-colors="colors"
+                    chart-options="options"
+                    
+                    >
+                </canvas>
+            </div>
+
+            <div class="descp-content">
+                <h4>Description</h4>
+                <p>{{selectedResponse.DESC}}</p>
+            </div>
+        </div>
+
+        
+
+    </div>
+</body>
+</html>
