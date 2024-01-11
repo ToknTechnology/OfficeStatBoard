@@ -32,7 +32,7 @@ def getServerDetails():
     recsFound = []
     try:
         connection = mysql.connector.connect(
-            host='tokn-badal-production-3.ceb8tlhezqpa.ap-southeast-2.rds.amazonaws.com',
+            host='tokn-cloud-production.ceb8tlhezqpa.ap-southeast-2.rds.amazonaws.com',
             database=database,
             user='toknsystems',
             password='Ctjye570jcd08i7Z3ZyVc2xJH3or{^NB',
@@ -77,6 +77,46 @@ def get_connections(URL):
         return []
 
 
+def getUsersLoggedOnToday():
+    # read the last logged in data from the db
+    global userList
+    try:
+        connection = mysql.connector.connect(
+            host='tokn-cloud-production.ceb8tlhezqpa.ap-southeast-2.rds.amazonaws.com',
+            database=database,
+            user='toknsystems',
+            password='Ctjye570jcd08i7Z3ZyVc2xJH3or{^NB',
+            use_pure=True)
+
+        cursor = connection.cursor(prepared=True)
+
+        # collect detail by company / instance
+        userList.clear()
+        sql_Query = """select distinct(userID) from """ + database + """.tbldevice where lastlogindate = %s"""
+
+        now = datetime.now()  # current date and time
+        today = now.strftime("%Y/%m/%d")
+
+        parms = (today,)
+        print(sql_Query + today)
+        cursor.execute(sql_Query, parms)
+        records = cursor.fetchall()
+        for row in records:
+            try:
+                userList.append(row[0].decode('utf-8'))
+            except Error as e:
+                print("Error building data result")
+
+        return userList
+    except Error as e:
+        print("Error reading logon data from MySQL table", e)
+
+    finally:
+        if (connection.is_connected()):
+            connection.close()
+            cursor.close()
+
+
 def process_servers(servers):
     global result
     global companyDetail
@@ -85,22 +125,6 @@ def process_servers(servers):
     global userList
     global currentDate
     userDetail = []
-
-    if currentDate != datetime.today().strftime('%Y%m%d'):
-        userList.clear()
-        currentDate = datetime.today().strftime('%Y%m%d')
-        # remove the file
-        try:
-            os.remove("users.json")
-        except:
-            print('no file to delete')
-
-    # read the file if there is one
-    try:
-        f = open("users.json", "r")
-        userList = json.loads(f.read())
-    except:
-        print('no file to read')
 
     # Get the data
     for server in servers:
@@ -140,7 +164,7 @@ def process_servers(servers):
     ServerInfo['ServerData'] = serverData
     result['ServerInfo'] = ServerInfo
     result['UserInfo'] = userDetail
-    result['UserList'] = userList
+    result['UserList'] = getUsersLoggedOnToday()
 
     # save the userList to local location
     f = open("users.json", "w")
@@ -149,6 +173,8 @@ def process_servers(servers):
 
 
 def process_server(server):
+    if server['serveraddress'] is None or server['serveraddress'] == '':
+        return
     url = 'http://' + server['serveraddress'] + ':8000/Connector'
     entries = get_connections(url)
     global companyDetail
@@ -160,16 +186,13 @@ def process_server(server):
         if 'User' in entry:
             if ((entry['User'] == '') or (entry['User'] == 'Anonymous')):
                 entries.remove(entry)
-            else:
-                if entry['User'] not in userList:
-                    userList.append(entry['User'])
         else:
             entries.remove(entry)
 
     # create a DB connection and keep it open
     try:
         connection = mysql.connector.connect(
-            host='tokn-badal-production-3.ceb8tlhezqpa.ap-southeast-2.rds.amazonaws.com',
+            host='tokn-cloud-production.ceb8tlhezqpa.ap-southeast-2.rds.amazonaws.com',
             database=database,
             user='toknsystems',
             password='Ctjye570jcd08i7Z3ZyVc2xJH3or{^NB',

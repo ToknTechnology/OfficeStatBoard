@@ -136,6 +136,10 @@ var app = angular.module('APP', ['chart.js']);
 
 	} ]);
 
+    window.onerror = function(msg, url, linenumber){
+        window.location.reload(true);
+        return true;
+    }
 
 </script>
 
