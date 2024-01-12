@@ -1,13 +1,14 @@
 from flask import Flask
 from flask_cors import CORS, cross_origin
 import mysql
-import base64
+#import base64
 import json
 import requests
 from mysql.connector import Error
 from datetime import datetime
-import time
-import os
+import pytz
+#import time
+#import os
 
 # variables
 database = 'tokn_production_mt'
@@ -39,7 +40,7 @@ def getServerDetails():
             use_pure=True)
 
         cursor = connection.cursor(prepared=True)
-        sql_Query = """select * from """ + database + """.tblserver"""
+        sql_Query = """select * from """ + database + """.tblserver where serveraddress <> ''"""
 
         cursor.execute(sql_Query)
         records = cursor.fetchall()
@@ -92,13 +93,26 @@ def getUsersLoggedOnToday():
 
         # collect detail by company / instance
         userList.clear()
-        sql_Query = """select distinct(userID) from """ + database + """.tbldevice where lastlogindate = %s"""
 
-        now = datetime.now()  # current date and time
-        today = now.strftime("%Y/%m/%d")
+        #calculate the dates
 
-        parms = (today,)
-        print(sql_Query + today)
+
+        sql_Query = """select distinct(userID) from """ + database + """.tbldevice where (lastlogindate = %s and lastLoginTime >= %s)  or (lastLoginDate = %s and lastLoginTime <= %s)"""
+
+        #get system date
+        now = datetime.now()  # current system date and time
+        systemDateMidnight = now.strftime("%Y/%m/%d 00:00:00")
+        UTC = pytz.timezone('UTC')
+
+        # calculate UTC from date
+        systemDateObject = datetime.strptime(systemDateMidnight, '%Y/%m/%d %H:%M:%S')
+        UTCDateTime = systemDateObject.astimezone(UTC)
+        FromDate = UTCDateTime.strftime("%Y/%m/%d")
+        FromTime = UTCDateTime.strftime("%H:%M:%S")
+        ToDate = systemDateObject.strftime("%Y/%m/%d")
+
+        parms = (FromDate, FromTime, ToDate, FromTime,)
+        print(sql_Query + str(parms))
         cursor.execute(sql_Query, parms)
         records = cursor.fetchall()
         for row in records:
