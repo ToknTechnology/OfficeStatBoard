@@ -23,6 +23,7 @@ html {
   position: fixed;
   overflow: hidden; }
 
+
 body {
   height: auto;
   width: 100%;
@@ -34,6 +35,19 @@ body {
   position: absolute;
   background-attachment: fixed;
   font-family: work-sans-regular; }
+
+.chart-wrapper {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    height: 80% } 
+
+.chart-wrapper-half {
+    display: inline-block;
+    position: relative;
+    width: 48%;
+    height: 80% } 
+  
 
 ::-moz-placeholder {
   color: #B9B9B7; }

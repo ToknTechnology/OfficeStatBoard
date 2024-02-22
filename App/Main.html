@@ -11,97 +11,314 @@
 <script src="jquery-3.3.1.min.js"></script>
 <script src="angular.min.js"></script>
 <script src="chart-merge.js"></script>
-<script src="chart.min.js"></script>
-<script src="angular-chart.min.js"></script>
+<!-- <script src="chart.js"></script> -->
+<!-- <script src="angular-chart.min.js"></script> -->
 <script src="leaflet/leaflet.js"></script>
 <!--<script src="data.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js"></script> -->
+
 
 <script>
 
-var app = angular.module('APP', ['chart.js']);
+
+// var app = angular.module('APP', ['chart.js']);
+var app = angular.module('APP', []);
+
 	app.controller( 'dataController',[ '$scope', '$interval', '$http', function($scope, $interval, $http) {
 
         $scope.companyLabels = [];
-        $scope.companySeries = ['Total'];
+        $scope.companySeries = ['Users'];
         $scope.companyData = [];
-        $scope.barOptions = {'scales':{'yAxes':[{'ticks': {'beginAtZero':true}}]}};
-        $scope.hbarOptions = {'scales':{'xAxes':[{'ticks': {'beginAtZero':true}}]}};
-        $scope.userCount = 0;
-	$scope.userList = [];
-        $scope.page = 1;
-        $scope.cycle = true;
-
-        // $scope.colors = [
-        //     {
-        //         "borderColor": "black",
-        //         "pointBackgroundColor": "#00dea1",
-        //     },
-        //     {
-        //         "borderColor": "black",
-        //         "pointBackgroundColor": "#00dea1",
-        //     },
-        //     {
-        //         "borderColor": "black",
-        //         "pointBackgroundColor": "#00dea1",
-        //     },
-        //     {
-        //         "borderColor": "black",
-        //         "pointBackgroundColor": "#00dea1",
-        //     },
-        //     {
-        //         "borderColor": "black",
-        //         "pointBackgroundColor": "#00dea1",
-        //     },
-        //     {
-        //         "borderColor": "black",
-        //         "pointBackgroundColor": "#00dea1",
-        //     },
-        //     {
-        //         "borderColor": "black",
-        //         "pointBackgroundColor": "#00dea1",
-        //     },
-        // ];
 
         $scope.serverLabels = [];
-        $scope.serverSeries = ['Total'];
+        $scope.serverSeries = ['Users'];
         $scope.serverData = [];
-        // $scope.serverColors = [
-        //                 {
-        //                     "borderColor": "black",
-        //                     "pointBackgroundColor": "#00dea1",
-        //                 },
-        //                 {
-        //                     "borderColor": "black",
-        //                     "pointBackgroundColor": "#00dea1",
-        //                 },
-        //                 {
-        //                     "borderColor": "black",
-        //                     "pointBackgroundColor": "#00dea1",
-        //                 },
-        //             ];
+
+        $scope.successLabels = [];
+        $scope.successSeries = ['Total'];
+        $scope.successData = [];
+        $scope.successBackground = [];
+        
+        $scope.errorLabels = [];
+        $scope.errorSeries = ['Total'];
+        $scope.errorData = [];
+        $scope.errorBackground = [];
+
+        $scope.barOptions = {'scales':{'yAxes':[{'ticks': {'beginAtZero':true}}]}};
+        $scope.hbarOptions = {'scales':{'xAxes':[{'ticks': {'beginAtZero':true}}]}};
+        
+        $scope.userCount = 0;
+	    $scope.userList = [];
+        $scope.page = 1;
+        $scope.cycle = true;
+        
+        $scope.errorsResult = {};
+
+//        $scope.transResult = null;
+        $scope.transErrors = [];
+        $scope.successTotal = 0;
+        $scope.errorTotal = 0;
+        $scope.userctx = null;
+        $scope.serverctx = null;
+        $scope.successctx = null;
+        $scope.errorctx = null;
+        $scope.errorChart = null;
+        $scope.successChart = null;
+        $scope.userChart = null;
+        $scope.serverChart = null;
+        $scope.heatRecs = [];
+        $scope.heatMapUpdated = false;
+        $scope.chartsCreated = false;
+
+        //marker lists
+        $scope.markerList = [];
+        $scope.heatMarkerList = [];
 
         $scope.toggleCycle = function(){
             $scope.cycle = !$scope.cycle;
         };
+
+        $scope.createCharts = function(){
+            $scope.createCompanyChart();
+            $scope.createServerChart();
+            $scope.createSuccessChart();
+            $scope.createErrorChart();
+            $scope.chartsCreated = true;
+        };
+        $scope.updateCharts = function(){
+            $scope.userChart.update();
+            $scope.serverChart.update();
+            $scope.successChart.update();
+            $scope.errorChart.update();    
+        };
+
+        $scope.destroyCharts = function(){
+            $scope.userChart.destroy();
+            $scope.userChart = null;
+            $scope.serverChart.destroy();
+            $scope.serverChart = null;
+            $scope.successChart.destroy();
+            $scope.successChart = null;
+            $scope.errorChart.destroy();
+            $scope.errorChart = null; 
+            $scope.chartsCreated = false;
+        };
+
+        $scope.createCompanyChart = function (){
+            $scope.userctx = document.getElementById("users").getContext("2d");
+            $scope.userctx.clearRect(0, 0, $scope.userctx.canvas.width, $scope.userctx.canvas.height);
+            $scope.userChart = new Chart($scope.userctx, {
+                type: 'bar',
+                data: {
+                    labels: $scope.companyLabels,
+                    datasets: [{
+                        label: $scope.companySeries[0],
+                        data: $scope.companyData,
+                        backgroundColor: getRandomColor($scope.companyData.length)
+                    }],
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    indexAxis: 'y',
+                    // Elements options apply to all of the options unless overridden in a dataset
+                    // In this case, we are setting the border of each horizontal bar to be 2px wide
+                    responsive: false,
+                    title: {
+                        display: true,
+                        text: 'Successful transactions'
+                    }
+                }
+            });
+            $scope.userChart.resize(1920,500);
+        };
+
+        $scope.createServerChart = function(){
+            $scope.serverctx = document.getElementById("servers").getContext("2d");
+            $scope.serverctx.clearRect(0, 0, $scope.serverctx.canvas.width, $scope.serverctx.canvas.height);
+            $scope.serverChart = new Chart($scope.serverctx, {
+                type: 'bar',
+                data: {
+                    labels: $scope.serverLabels,
+                    datasets: [{
+                        label: $scope.serverSeries[0],
+                        data: $scope.serverData,
+                        backgroundColor: getRandomColor($scope.serverData.length)
+                    }],
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    indexAxis: 'x',
+                    // Elements options apply to all of the options unless overridden in a dataset
+                    // In this case, we are setting the border of each horizontal bar to be 2px wide
+                    responsive: false,
+                    title: {
+                        display: true,
+                        text: 'Successful transactions'
+                    }
+                }
+            });
+            $scope.serverChart.resize(1920,380);
+        };
+
+        $scope.createSuccessChart = function(){
+            $scope.successctx = document.getElementById("successtransactions").getContext("2d");
+            $scope.successctx.clearRect(0, 0, $scope.successctx.canvas.width, $scope.successctx.canvas.height);
+            $scope.successChart = new Chart($scope.successctx, {
+                type: 'bar',
+                data: {
+                    labels: $scope.successLabels,
+                    datasets: [{
+                        label: $scope.successSeries[0],
+                        data: $scope.successData,
+                        backgroundColor: $scope.successBackground
+                    }],
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    indexAxis: 'y',
+                    // Elements options apply to all of the options unless overridden in a dataset
+                    // In this case, we are setting the border of each horizontal bar to be 2px wide
+                    responsive: false,
+                    title: {
+                        display: true,
+                        text: 'Successful transactions'
+                    }
+                }
+            });
+            $scope.successChart.resize(1920, 800);
+        };
+
+        $scope.createErrorChart = function(){
+            $scope.errorctx = document.getElementById("errortransactions").getContext("2d");
+            $scope.errorctx.clearRect(0, 0, $scope.errorctx.canvas.width, $scope.errorctx.canvas.height);
+            $scope.errorChart = new Chart($scope.errorctx, {
+                type: 'bar',
+                data: {
+                    labels: $scope.errorLabels,
+                    datasets: [{
+                        label: $scope.errorSeries[0],
+                        data: $scope.errorData,
+                        backgroundColor: $scope.errorBackground
+                    }],
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    indexAxis: 'y',
+                    // Elements options apply to all of the options unless overridden in a dataset
+                    // In this case, we are setting the border of each horizontal bar to be 2px wide
+                    responsive: false,
+                    title: {
+                        display: true,
+                        text: 'Failed transactions'
+                    }
+                }
+            });
+            $scope.errorChart.resize(900, 800);
+        };
+
         $scope.setPage = function(pageNumber){
             $scope.page = pageNumber;
         };
 
+        $interval(function(){
+            if ($scope.cycle){
+                switch ($scope.page){
+                    case 1:
+                        $scope.setPage(2);
+                        break;
+                    case 2:
+                        $scope.setPage(3);
+                        break;
+                    case 3:
+                        $scope.setPage(4);
+                        break; 
+                    case 4:
+                        $scope.setPage(5);
+                        break;       
+                    case 5:
+                        $scope.setPage(1);
+                        break;      
+                };
+            };
+        },20000);
 
-        $interval(function() {
-            console.log('Interval');
+        $scope.incrementError = function(){
+            $scope.errorLabels.push('Append');
+            $scope.errorSeries = ['Total'];
+            $scope.errorData.push(1);
+            $scope.errorChart.update();  
+        };
+
+        $scope.clearTrans = function(){
+
+            $scope.errorLabels.pop();
+            $scope.errorSeries = ['Total'];
+            $scope.errorData.pop();
+            $scope.errorChart.update();  
+
+            // try {
+            //     $scope.companyLabels = ['Reset'];
+            //     $scope.companySeries = ['Users'];
+            //     $scope.companyData = [1];
+
+            //     $scope.serverLabels = ['Reset'];
+            //     $scope.serverSeries = ['Users'];
+            //     $scope.serverData = [1];
+
+            //     $scope.successLabels = ['Reset'];
+            //     $scope.successSeries = ['Total'];
+            //     $scope.successData = [1];
+            //     $scope.successChart.update();
+                
+            //     $scope.errorLabels = ['Reset'];
+            //     $scope.errorSeries = ['Total'];
+            //     $scope.errorData = [1];
+
+            //     $scope.updateCharts();
+            // }
+            // catch (err){
+
+            // };
+        };
+
+        $scope.getGraphData = function(){
+            //Get the user lists
+            $scope.companyLabels = [];
+            $scope.companyData = [];
+            $scope.serverLabels = [];
+            $scope.serverData = [];
+            $scope.heatRecs = [];
+         
             $http({
                 method: 'GET',
-                url: 'http://127.0.0.1:5000'
+                url: 'http://127.0.0.1:5000/serverusers'
             }).then(function successCallback(response) {
                 //Got data, put it into the scope vars
-                var result = response.data;
-                var CompanyInfo = result['CompanyInfo'];
+                let result = response.data;
+                let CompanyInfo = result['CompanyInfo'];
                 $scope.companyLabels = CompanyInfo['CompanyLabels'];
                 $scope.companySeries = CompanyInfo['CompanySeries'];
                 $scope.companyData = CompanyInfo['CompanyData'];
+                $scope.UsersToday = result['UsersToday']
                 $scope.userCount = 0;
-		        $scope.userList = result['UserList'];
+                $scope.userList = result['UserList'];
                 for (x=0;x<$scope.companyData.length;x++){
                     try {
                         $scope.userCount = $scope.userCount + $scope.companyData[x];
@@ -109,32 +326,126 @@ var app = angular.module('APP', ['chart.js']);
                     catch (err){
 
                     };
-                }
+                };
 
-                var ServerInfo = result['ServerInfo'];
+                let ServerInfo = result['ServerInfo'];
                 $scope.serverLabels = ServerInfo['ServerLabels'];
                 $scope.serverSeries = ServerInfo['ServerSeries'];
                 $scope.serverData = ServerInfo['ServerData'];
 
-                if ($scope.cycle){
-                    switch ($scope.page){
-                        case 1:
-                            $scope.page = 2;
-                            break;
-                        case 2:
-                            $scope.page = 1;
-                            break;
-                    };
-                };
                 addMarkers(result['UserInfo']);
 
+                result = null;
+                CompanyInfo = null;
+                response = null;
 
             }, function errorCallback(response) {
             });
-          }, 15000);
 
+            //Get the transactions lists
+            $http({
+                method: 'GET',
+                url: 'http://127.0.0.1:5000/companytransactions'
+            }).then(function successCallback(response) {
+                $scope.successTotal = response.data['SuccessTotal'];
+                $scope.errorTotal = response.data['ErrorTotal'];
+                
+                $scope.successLabels = response.data['successLabels']
+                $scope.successData = response.data['successDatasets'][0].data;
+                $scope.successBackground = getGreenColor($scope.successData.length);
+                
+                $scope.errorLabels = response.data['errorLabels']
+                $scope.errorData = response.data['errorDatasets'][0].data;
+                $scope.errorBackground = getRedColor($scope.errorData.length);
+                response = null;
+                
+                //Get the Error descriptions
+                $http({
+                    method: 'GET',
+                    url: 'http://127.0.0.1:5000/transactionerrors'
+                }).then(function successCallback(response) {
+                    //Got data, put it into the scope vars
+                    $scope.transErrors = [];
+                    $scope.transErrors = response.data['Result'];
+                    response = null;
 
-	} ]);
+                    //Create charts if they dont exist
+                    if (!$scope.chartsCreated){
+                        $scope.createCharts();
+                    }
+                    else {
+                        $scope.destroyCharts();
+                        $scope.createCharts();
+                        
+                        //$scope.updateCharts();
+
+                    };
+
+                },function errorCallback(response) {
+                    
+                });
+
+                let now = new Date();
+                if ((now.getHours() == "08") && (now.getMinutes() == "00")){
+                    $scope.heatMapUpdated = false;
+                };
+
+                if (!$scope.heatMapUpdated){
+                    $http({
+                        method: 'GET',
+                        url: 'http://127.0.0.1:5000/heatdata'
+                    }).then(function successCallback(response) {
+                        //Got data, put it into the scope vars
+                        $scope.heatRecs = response.data['Result'];
+                        response = null;
+                        addHeatMarkers($scope.heatRecs);
+                        $scope.heatRecs = [];
+                        $scope.heatMapUpdated = true;
+
+                    },function errorCallback(response) {
+                        
+                    });
+                };
+
+                
+            },function errorCallback(response) {
+                
+            });
+        };
+
+        $scope.getGraphData();
+
+        $interval(function() {
+                var scope = angular.element(document.getElementById("APP")).scope();
+                scope.getGraphData();
+            }, 40000);
+        }]);
+
+        function getRandomColor(count) {
+            let colors = [];
+            for (let i = 0; i < count; i++) {
+                let color = 'rgb(' + (Math.random()*256|0) + "," + (Math.random()*256|0) + ',' + (Math.random()*256|0) + ')'
+                colors.push(color);
+            };
+            return colors;
+        };
+
+        function getGreenColor(count) {
+            let colors = [];
+            for (let i = 0; i < count; i++) {
+                let color = 'rgb(0, 140, 0)'
+                colors.push(color);
+            };
+            return colors;
+        };
+        function getRedColor(count) {
+            let colors = [];
+            for (let i = 0; i < count; i++) {
+                let color = 'rgb(255, 0, 0)'
+                colors.push(color);
+            };
+            return colors;
+        };
 
     window.onerror = function(msg, url, linenumber){
         window.location.reload(true);
@@ -142,6 +453,31 @@ var app = angular.module('APP', ['chart.js']);
     }
 
 </script>
+<style>
+    table {
+      font-family: arial, sans-serif;
+      font-size: 11px;
+      border-collapse: collapse;
+      width: 90%;
+      height: 90%;
+    }
+    
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    tr {
+        height: 10px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+</style>
+
+
 
 <body>
     <div id="APP" ng-app="APP" ng-controller="dataController" class="my-outlet">
@@ -154,112 +490,194 @@ var app = angular.module('APP', ['chart.js']);
 
         <div class="main-container">
 
-            <div class="descp-content">
-                <h3>Users currently connected: {{userCount}}</h3>
-		<h3>Users that have connected today: {{userList.length}}
-            </div>
-
             <div>
                 <button ng-if="cycle == true" class="button" ng-click="toggleCycle()">Stop carousel</button>
                 <button ng-if="cycle == false" class="button" ng-click="toggleCycle()">Start carousel</button>
                 <button ng-if="cycle == false" class="button" ng-click="setPage(1)">Company Servers</button>
-                <button ng-if="cycle == false" class="button" ng-click="setPage(2)">Map</button>
+                <button ng-if="cycle == false" class="button" ng-click="setPage(2)">Successful Transactions</button>
+                <button ng-if="cycle == false" class="button" ng-click="setPage(3)">Failed Transactions</button>
+                <button ng-if="cycle == false" class="button" ng-click="setPage(4)">Map</button>
+                <button ng-if="cycle == false" class="button" ng-click="setPage(5)">User Heat Map</button>
+                <!-- <button ng-if="cycle == false" class="button" ng-click="incrementError()">Increment</button>
+                <button ng-if="cycle == false" class="button" ng-click="clearTrans()">ClearData</button> -->
             </div>
 
             <br>
 
             <div ng-show="page == 1">
-                <div class="bar-content" style="height: 80%;">
-                    <canvas height="80%"
-                        id="users"
-                        class="chart-horizontal-bar"
-                        chart-data="companyData"
-                        chart-labels="companyLabels"
-                        chart-series="companySeries"
-                        chart-colors="colors"
-                        chart-options="hbarOptions">
+                <div class="descp-content">
+                    <h3>Users currently connected: {{userCount}}</h3>
+                    <h3>Companies currently active: {{companyLabels.length}}</h3>
+                    <h3>Users that have connected today: {{UsersToday}}</h3>
+                </div>
+
+                <!-- <div class="bar-content" style="height: 80%;"> -->
+                <div class="chart-wrapper">
+                    <canvas id="users">
                     </canvas>
                 </div>
                 <br>
                 <br>
-                <div class="bar-content" style="height: 20%;">
+                <!-- <div class="bar-content" style="height: 20%;"> -->
+                <div class="chart-wrapper">
                     <canvas height="30%"
-                        id="servers"
-                        class="chart chart-bar"
-                        chart-data="serverData"
-                        chart-labels="serverLabels"
-                        chart-series="serverSeries"
-                        chart-colors="serverColors"
-                        chart-options="barOptions">
+                        id="servers">
                     </canvas>
                 </div>
 
+            </div>
+
+            <div ng-show="page == 2">
+                <div class="descp-content">
+                    <h3>Successful transactions today: {{successTotal}}</h3>
+                </div>
+                <!-- <div class="bar-content" style="height: 90%;"> -->
+                <div class="chart-wrapper">
+                    <canvas id="successtransactions">
+                    </canvas>
+                </div>
+            </div>
+
+            <div ng-show="page == 3">
+                <div class="descp-content">
+                    <h3>Failed transactions today: {{errorTotal}}</h3>
+                </div>
+                <!-- <div class="bar-content" style="height: 90%;"> -->
+                <div style="width:1920px;">
+                    <div class="chart-wrapper-half" style="float:left;">
+                        <canvas id="errortransactions">
+                        </canvas>
+                    </div>
+                    <!-- Nice table of the errors -->
+                    <div class="chart-wrapper-half" style="float:right;">
+                        <table>
+                            <tr>
+                            <th>Company</th>
+                            <th>Error</th>
+                            <th>Count</th>
+                            </tr>
+                            <tr ng-repeat="item in transErrors">
+                            <td>{{item.company}}</td>
+                            <td>{{item.msg}}</td>
+                            <td>{{item.count}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- <div id="map" style="height:85%"  ng-if="page == 2"> -->
-            <div ng-show="page == 2" id="map" style="height:85%">
-
+            <div ng-show="page == 4">
+                <div class="descp-content">
+                    <h3>Current user locations</h3>
+                </div>
+                <div  id="map" style="height:900px">
+                
+                </div>
             </div>
-
+            <div ng-show="page == 5">
+                <div class="descp-content">
+                    <h3>User heat map last 365 days</h3>
+                </div>
+                <div  id="heatmap" style="height:900px">
+                
+                </div>
+            </div>
         </div>
 
     </div>
 </body>
 
 <script>
+    
 
     const mapDiv = document.getElementById("map");
-	//const map = L.map('map').setView([0, 0], 3);
-
-	//const map = L.map('map', {zoomSnap: 0.25}).setView([9.388193, 21.706990], 2.50 , { animation: true });
+    const heatMapDiv = document.getElementById("heatmap");
+	
     const map = L.map('map', {zoomSnap: 0.25}).setView([17.018827, 21.706990], 2.50 , { animation: true });
+    const heatmap = L.map('heatmap', {zoomSnap: 0.25}).setView([17.018827, 21.706990], 2.50 , { animation: true });
+    
 
-    var markerList = [];
-    //var markerLayer = new L.LayerGroup();
-    //markerLayer.addTo(map);
-
-
-	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 19,
 		attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	}).addTo(map);
 
+    const heattiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(heatmap);
+
     const resizeObserver = new ResizeObserver(() => {
-        //map.invalidateSize();
+        map.invalidateSize();
+    });
+    const resizeObserverHeat = new ResizeObserver(() => {
+        heatmap.invalidateSize();
     });
 
     resizeObserver.observe(mapDiv);
-
-
+    resizeObserverHeat.observe(mapDiv);    
+ 
     function addMarkers(inData){
 
-        console.log('Clearing map');
-        // markerLayer.clearLayers();
-        for (x=0;x<markerList.length;x++){
-            var entry = markerList[x];
-            map.removeLayer(entry);
-        };
+        let scope = angular.element(document.getElementById("APP")).scope();
+   
+            try{
+                while (scope.markerList.length > 0){
+                     map.removeLayer(scope.markerList[0]);
+                     scope.markerList.shift();
+                };
 
+                for (x=0;x<inData.length;x++){
+                    try {
+                        let entry = inData[x];
+                        let marker = L.marker([entry['Lat'], entry['Lon']]);
+                        scope.markerList.push(marker);
+                        marker.addTo(map);
 
+                        entry = null;
+                        marker = null;
+                    }
+                    catch (err){
 
-        console.log('Adding ' + inData.length + ' entries');
-        for (x=0;x<inData.length;x++){
-            try {
-                var entry = inData[x];
-                var marker = L.marker([entry['Lat'], entry['Lon']]);
-
-                //markerLayer.addLayer(marker);
-                markerList.push(marker);
-                marker.addTo(map);
-             }
-            catch (err){
-
+                    };
+                };
+                //window.dispatchEvent(new Event('resize'));   
+            }catch(err){
             };
-        };
-
-
+        
     };
 
+    function addHeatMarkers(heatData){
+        
+        let scope = angular.element(document.getElementById("APP")).scope();
+      
+            try{
+                while (scope.heatMarkerList.length > 0){
+                     heatmap.removeLayer(scope.heatMarkerList[0]);
+                     scope.heatMarkerList.shift();
+                };
+
+                for (x=0;x<heatData.length;x++){
+                    try {
+                        let heatEntry = heatData[x];
+                        let heatMarker = L.circleMarker([heatEntry['Lat'], heatEntry['Lon']], {radius: 1, color:'#FF0000'});
+                       
+                        scope.heatMarkerList.push(heatMarker);
+                        heatMarker.addTo(heatmap);
+
+                        heatEntry = null;
+                        heatMarker = null;
+                    }
+                    catch (err){
+
+                    };
+                };
+                //window.dispatchEvent(new Event('resize'));   
+            }catch(err){
+            };
+        
+    };
 </script>
 
 
