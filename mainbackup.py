@@ -311,40 +311,5 @@ def main():
     return json.dumps(result)
 
 
-@app.route("/companyusers")
-@cross_origin()
-def userCountByCompany():
-    global result
-    result = {}
-
-    # clear all
-    clearAll()
-    servers = getServerDetails()
-
-    now = datetime.now()  # current date and time
-    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
-    print('Run at ' + date_time)
-    process_servers(servers)
-
-    return json.dumps(result)
-
-@app.route("/servers")
-@cross_origin()
-def userCountByCompany():
-    global result
-    result = {}
-
-    # clear all
-    clearAll()
-    servers = getServerDetails()
-
-    now = datetime.now()  # current date and time
-    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
-    print('Run at ' + date_time)
-    process_servers(servers)
-
-    return json.dumps(result)
-
-
 if __name__ == "__main__":
     app.run()
