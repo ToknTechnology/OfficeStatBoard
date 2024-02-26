@@ -35,7 +35,9 @@ errorsToIgnore = ['Authentication failed',
                   'You must specify the supplier',
                   'Unknown FixedAsset',
                   'This user is not currently able to approve',
-                  'Unknown Supplier:']
+                  'Unknown Supplier:',
+                  'You must specify the Supplier',
+                  'Customer not found on Job']
 
 currentDate = ''
 
