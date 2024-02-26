@@ -25,6 +25,16 @@ userList = []
 transactions = []
 companyNumbers = []
 companyDetails = []
+errorsToIgnore = ['Authentication failed',
+                  'Found duplicate, abort',
+                  'Invalid attempt to create an AP Invoice',
+                  'could not be found',
+                  'Leave Request cannot be submitted with status',
+                  'Unknown Job',
+                  'is closed',
+                  'You must specify the supplier',
+                  'Unknown FixedAsset',
+                  'This user is not currently able to approve']
 
 currentDate = ''
 
@@ -420,10 +430,16 @@ def getGuidErrors():
         for row in records:
             try:
                 entry = {}
+                skip = False
                 entry['company'] = getCompanyName(row[0].decode('utf-8')[0:17])
                 entry['msg'] = row[1].decode('utf-8')
                 entry['count'] = row[2]
-                recsFound.append(entry)
+                for err in errorsToIgnore:
+                    if err in entry['msg']:
+                        skip = True
+                        break
+                if not skip:
+                    recsFound.append(entry)
             except Error as e:
                 print("Error building data result")
         return recsFound
